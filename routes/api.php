@@ -19,6 +19,7 @@ Route::get('/student/a', 'StudentController@abc');
 Route::get('/session', 'SessionController@index');
 Route::get('/com-sub', 'CommerceSubjectController@index');
 Route::get('/student/view', 'StudentController@index');
+Route::get('/update/{id}', 'StudentController@show');
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });

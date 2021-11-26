@@ -17,10 +17,13 @@ class StudentController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $req)
+    public function index(Request $req) 
     {
+        $stream_id = $req->stream;
+        $year_id = $req->year;
+        $session_id = $req->session;
 
-        $data = DB::table('students')->select("s_name","roll_no","section")->where('mr_no','=',1)->get();
+        $data = DB::table('students')->select('mgts.id as mgts_id','mgts.student_uid','mgts.session_uid','mgts.dept_uid','mgts.optional_uid','mgts.stream_uid','students.*','hostels.*','documents.*','adrsinfos.*')->where('session_uid','=',$session_id)->where('dept_uid','=',$year_id)->where('stream_uid','=',$stream_id)->join('mgts','students.id','=','mgts.student_uid')->join('adrsinfos','adrsinfos.student_adrs_uid','=','students.id')->join('hostels','hostels.student_hostel_uid','=','students.id')->join('documents','documents.student_doc_uid','=','students.id')->join('optionls','optionls.id','=','mgts.optional_uid')->get();
         return $data;
     }
     public function abc(Request $req){
@@ -194,8 +197,13 @@ class StudentController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function show($id)
-    {
-        //
+    {   
+        $data = DB::table('mgts')->select('mgts.id as mgts_id','mgts.student_uid','mgts.session_uid','mgts.dept_uid','mgts.optional_uid','mgts.stream_uid','students.*','hostels.*','documents.*','adrsinfos.*')->join('students','mgts.student_uid','students.id')->join('hostels','hostels.student_hostel_uid','students.id')->join('documents','documents.student_doc_uid','students.id')->join('adrsinfos','adrsinfos.student_adrs_uid','students.id')->where('mgts.id','=',$id)->get();
+        if($data){
+            return $data;
+        }else{
+            return ['response'=> 400 ,'data'=> 'Problem in data fetching']; 
+        }
     }
 
     /**
@@ -229,6 +237,12 @@ class StudentController extends Controller
      */
     public function destroy($id)
     {
-        //
+        // $data = DB::table('mgts')->where('id','=',$id)->delete();
+        // if($data){
+        //     return ['status'=>'success','message'=>"Delete Message Success"];
+        // }else{
+        //     return ['status'=>'failed','message'=>"Not Deleted"];
+        // }
+        return ['data'=>$id];
     }
 }
