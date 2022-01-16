@@ -3,20 +3,19 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Session;
+use App\Mark;
 use Illuminate\Support\Facades\DB;
-class SessionController extends Controller
+class MarkController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $req)
     {
-        $session = DB::table('sessions')->select('id','session_year')->get();
-        return $session;
-
+        $data = DB::table('marks')->where('marks.mgts_uid','=', $req->id)->get();
+        return $data;
     }
 
     /**
@@ -26,7 +25,7 @@ class SessionController extends Controller
      */
     public function create()
     {
-        //
+        
     }
 
     /**
@@ -37,8 +36,22 @@ class SessionController extends Controller
      */
     public function store(Request $request)
     {
-        
-
+        $mark = new Mark();
+        $mark->mgts_uid = $request->mgts;
+        $mark->semester_uid = $request->semester;
+        $mark->sub_1 = $request->paper1;
+        $mark->sub_2 = $request->paper2;
+        $mark->sub_3 = $request->paper3;
+        $mark->sub_4 = $request->paper4;
+        $mark->sub_5 = $request->paper5;
+        $mark->sub_6 = $request->paper6;
+        $mark->sub_7 = $request->paper7;
+        $data = $mark->save();
+        if($data){
+            return ['status'=>200, 'message'=>'Mark submited Success'];
+        }else{
+            return ['status'=>404,'message'=> 'Error Ocured'];
+        }
     }
 
     /**

@@ -2,7 +2,8 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-
+use App\Http\Controllers\MarkController;
+use App\Http\Controllers\SemesterController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -16,6 +17,9 @@ use Illuminate\Support\Facades\Route;
 Route::post('/student/add', 'StudentController@store');
 Route::post('/student/add_excel', 'StudentController@store_excel');
 Route::get('/student/a', 'StudentController@abc');
+Route::apiResource('/mark', 'MarkController');
+Route::apiResource('/semester', 'SemesterController');
+Route::apiResource('/mark','MarkController');
 // Route::apiResource('/session', 'SessionController');
 Route::get('/com-sub', 'CommerceSubjectController@index');
 Route::get('/student/view', 'StudentController@index');

@@ -1,0 +1,1 @@
+for mark insert url = url/mark, method = post, data = [mgt,semester,first,second,third,fourth,fifth,sixth,seventh];

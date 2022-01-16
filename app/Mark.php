@@ -7,5 +7,5 @@ use Illuminate\Database\Eloquent\Model;
 class Mark extends Model
 {
     protected $table = "marks";
-    protected $fillable = ['student_mark_uid', 'sub_1', 'sub_2', 'sub-3', 'sub-4', 'sub-5', 'sub-6', 'sub-7'];
+    protected $fillable = ['mgts_uid','semester_uid','sub_1','sub_2','sub_3','sub_4','sub_5','sub_6','sub_7'];
 }
