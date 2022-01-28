@@ -16,7 +16,10 @@ class SemesterController extends Controller
          $data = DB::table('semesters')->get()->all();
          return $data;
     }
-
+    
+    /** Display a new resource of semester data
+    */
+   
     /**
      * Show the form for creating a new resource.
      *

@@ -24,7 +24,7 @@ class StudentController extends Controller
         $year_id = $req->year;
         $session_id = $req->session;
 
-        $data = DB::table('students')->select('mgts.id as mgts_id','mgts.student_uid','mgts.session_uid','mgts.dept_uid','mgts.optional_uid','mgts.stream_uid','students.*','hostels.*','documents.*','adrsinfos.*', 'smsinfos.sms_no')->where('session_uid','=',$session_id)->where('dept_uid','=',$year_id)->where('stream_uid','=',$stream_id)->join('mgts','students.id','=','mgts.student_uid')->join('adrsinfos','adrsinfos.student_adrs_uid','=','students.id')->join('hostels','hostels.student_hostel_uid','=','students.id')->join('documents','documents.student_doc_uid','=','students.id')->join('optionls','optionls.id','=','mgts.optional_uid')->join('smsinfos','smsinfos.student_sms_uid', 'students.id')->get();
+        $data = DB::table('students')->select('mgts.id as mgts_id','mgts.student_uid','mgts.session_uid','mgts.dept_uid','mgts.optional_uid','mgts.stream_uid','students.*','hostels.*','documents.*','adrsinfos.*', 'smsinfos.sms_no')->where('session_uid','=',$session_id)->where('dept_uid','=',$year_id)->where('stream_uid','=',$stream_id)->join('mgts','students.id','=','mgts.student_uid')->join('adrsinfos','adrsinfos.student_adrs_uid','=','students.id')->join('hostels','hostels.mgts_uid','=','mgts.id')->join('documents','documents.student_doc_uid','=','students.id')->join('optionls','optionls.id','=','mgts.optional_uid')->join('smsinfos','smsinfos.student_sms_uid', 'students.id')->get();
         return $data;
     }
     public function abc(Request $req){
@@ -102,20 +102,23 @@ class StudentController extends Controller
             $data2->lg_guard= $req->lg_guard;
             $data2->lg_guard_no= $req->lg_contact;
             $data2->save();
-
-            $hostel->student_hostel_uid = $st_id;
-            $hostel->hostel_name = $req->h_name;
-            $hostel->floor = $req->floor_n;
-            $hostel->room = $req->room_n; 
-            $hostel->res_day = $req->res_day;
-            $hostel->save(); 
-
+            
             $mgt->student_uid = $st_id;
             $mgt->session_uid = $req->session;
             $mgt->dept_uid = $req->stream_year;
             $mgt->optional_uid = $req->optional;
             $mgt->stream_uid = $req->streamm;
             $mgt->save();
+            $mgt_id = $mgt->id;
+
+            if($req->hostel_f == 1){
+            $hostel->hostel_name_uid = $req->h_name;
+            $hostel->mgts_uid = $mgt_id;
+            $hostel->floor = $req->floor_n;
+            $hostel->room = $req->room_n; 
+            $hostel->res_day = $req->res_day;
+            $hostel->save(); 
+             }
 
             $sms->student_sms_uid = $st_id;
             $sms->sms_no = $req->sms_no;
@@ -133,87 +136,100 @@ class StudentController extends Controller
     }
 
 
-    public function store_excel(Request $req)
+    public function store_excel(Request $request)
     {   
-  
        $data = new Student();  
         $data1 = new Document();
         $data2 = new Adrsinfo(); 
         $hostel = new Hostel();
         $sms = new Smsinfo();
         $mgt = new Mgt();
-            $data->s_name = $req->name;
-            $data->admision_date = $req->ad;
-            $data->mr_no = $req->mr;
-            $data->roll_no = $req->roll;
-            $data->barcode = $req->Barcode;
-            $data->section = $req->section;
-            $data->gender = $req->gender;
-            $data->ref_by = $req->refered;
-            $data->board_name = $req->board;
-            $data->board_roll = $req->board_roll;
-            $data->board_mark = $req->hsc_mark;
-            $data->board_percent = $req->hsc_per;
-            $data->board_grade = $req->grade;
-            $data->school_name = $req->school_name;
-            $data->school_address = $req->school_address;
-            $data->adhar_no = $req->adhar;
-            $data->mig = $req->mig;
-            $data->caste = $req->caste;
-            $data->blood_group = $req->blood;
-            $data->slc= $req->slc; 
-            $data->slc_date= $req->slc_date; 
-            $data->join_year= $req->join_year;
-            $data->pass_year= $req->pass_year;
-            $data->hostel_status = $req->hostel_f;
-            $result = $data->save();
-            $st_id = $data->id;
-            $data1->student_doc_uid = $st_id;
-            $data1->document_name = $req->document;
-            $data1->save();
-            // $data->hostel_status= $req->hostel_f;
+        $result = null;
 
-            $data2->student_adrs_uid = $st_id;
-            $data2->dist_name= $req->district;
-            $data2->address= $req->corres_address;
-            $data2->f_name= $req->father_name;
-            $data2->f_occu= $req->father_occu;
-            $data2->f_annual= $req->father_income;
-            $data2->m_name= $req->mother_name;
-            $data2->m_occu= $req->mother_occu;
-            $data2->m_annual= $req->mother_income;           
-            $data2->mob_no= $req->contact_no;
-            $data2->wh_no= $req->wh_no;
-            $data2->lg_guard= $req->lg_guard;
-            $data2->lg_guard_no= $req->lg_contact;
-            $data2->save();
+          //$res = json_decode($request,true);
+          //$res1 = json_decode(json_encode($res[0]),true);
+            $res = $request->val;
+            $hell = json_decode($res[0],true);
+            return $hell;
+           //return $res['name'];
+          //var_dump($res1);
+         //$res =  json_decode(json_encode($request),TRUE);
+           // foreach ($request->val as  $req) {
+           //    return $req;
+           // $req = json_decode($res);
+            // $data->s_name = $req->name;
+            // $data->admision_date = $req->ad;
+            // $data->mr_no = $req->mr;
+            // $data->roll_no = $req->roll;
+            // $data->barcode = $req->Barcode;
+            // $data->section = $req->section;
+            // $data->gender = $req->gender;
+            // $data->ref_by = $req->refered;
+            // $data->board_name = $req->board;
+            // $data->board_roll = $req->board_roll;
+            // $data->board_mark = $req->hsc_mark;
+            // $data->board_percent = $req->hsc_per;
+            // $data->board_grade = $req->grade;
+            // $data->school_name = $req->school_name;
+            // $data->school_address = $req->school_address;
+            // $data->adhar_no = $req->adhar;
+            // $data->mig = $req->mig;
+            // $data->caste = $req->caste;
+            // $data->blood_group = $req->blood;
+            // $data->slc= $req->slc; 
+            // $data->slc_date= $req->slc_date; 
+            // $data->join_year= $req->join_year;
+            // $data->pass_year= $req->pass_year;
+            // $data->hostel_status = $req->hostel_f;
+            // $result = $data->save();
+            // $st_id = $data->id;
+            // $data1->student_doc_uid = $st_id;
+            // $data1->document_name = $req->document;
+            // $data1->save();
+            // // $data->hostel_status= $req->hostel_f;
 
-            $hostel->student_hostel_uid = $st_id;
-            $hostel->hostel_name = $req->h_name;
-            $hostel->floor = $req->floor_n;
-            $hostel->room = $req->room_n; 
-            $hostel->res_day = $req->res_day;
-            $hostel->save(); 
+            // $data2->student_adrs_uid = $st_id;
+            // $data2->dist_name= $req->district;
+            // $data2->address= $req->corres_address;
+            // $data2->f_name= $req->father_name;
+            // $data2->f_occu= $req->father_occu;
+            // $data2->f_annual= $req->father_income;
+            // $data2->m_name= $req->mother_name;
+            // $data2->m_occu= $req->mother_occu;
+            // $data2->m_annual= $req->mother_income;           
+            // $data2->mob_no= $req->contact_no;
+            // $data2->wh_no= $req->wh_no;
+            // $data2->lg_guard= $req->lg_guard;
+            // $data2->lg_guard_no= $req->lg_contact;
+            // $data2->save();
+            
+            // $mgt->student_uid = $st_id;
+            // $mgt->session_uid = $req->stream_session;
+            // $mgt->dept_uid = $req->stream_year;
+            // $mgt->optional_uid = 4;
+            // $mgt->stream_uid = $req->stream;
+            // $mgt->save();
 
-            $mgt->student_uid = $st_id;
-            $mgt->session_uid = $req->stream_session;
-            $mgt->dept_uid = $req->stream_year;
-            $mgt->optional_uid = 2;
-            $mgt->stream_uid = $req->stream;
-            $mgt->save();
+            // // $hostel->student_hostel_uid = $st_id;
+            // // $hostel->hostel_name = $req->h_name;
+            // // $hostel->floor = $req->floor_n;
+            // // $hostel->room = $req->room_n; 
+            // // $hostel->res_day = $req->res_day;
+            // // $hostel->save();
 
-            $sms->student_sms_uid = $st_id;
-            $sms->sms_no = $req->sms_no;
-            $sms->save();
+            // $sms->student_sms_uid = $st_id;
+            // $sms->sms_no = $req->sms_no;
+            // $sms->save();
             // $data->stream= $req->streamm;
             // $data->stream_year= $req->stream_year;
             // $result1 = $data1->save();
             // $result2 = $data2->save();
-            if($result){
-                return ['response' => 200,'message'=>'Data insterted success'];
-            }else{
-                return ['response'=>400,'message'=>'Data inserted failed'];
-            }
+            // if($result){
+            //     return ['response' => 200,'message'=>'Data insterted success'];
+            // }else{
+            //     return ['response'=>400,'message'=>'Data inserted failed'];
+            // }
+          // }  
     }
     /**
      * Display the specified resource.

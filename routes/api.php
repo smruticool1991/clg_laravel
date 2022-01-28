@@ -20,6 +20,14 @@ Route::get('/student/a', 'StudentController@abc');
 Route::apiResource('/mark', 'MarkController');
 Route::apiResource('/semester', 'SemesterController');
 Route::apiResource('/mark','MarkController');
+Route::get('/result', 'MarkController@some')->name('mark.some');
+Route::get('/semester/manual', 'MarkController@manual');
+Route::apiResource('/hostel', 'HostelController');
+Route::get('/hostel/{id}/edit', 'HostelController@edit')->name('hostel.edit');
+Route::apiResource('/hostelname','HostelNameController');
+Route::apiResource('/session', 'SessionController');
+Route::apiResource('/sms', 'SmsController');
+Route::apiResource('/book', 'BookDetailController');
 // Route::apiResource('/session', 'SessionController');
 Route::get('/com-sub', 'CommerceSubjectController@index');
 Route::get('/student/view', 'StudentController@index');
@@ -29,9 +37,9 @@ Route::get('student/delete', 'StudentController@destroy');
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user(); 
 });
-Route::group(['middleware' => 'key'], function(){
-	Route::get('/session','SessionController@index');
-});
+// Route::group(['middleware' => 'key'], function(){
+// 	Route::get('/session','SessionController@index');
+// });
 // Route::group(['middleware'=>'auth:api'],function(){
 // 	Route::get('./session','SessionController@index');
 // });

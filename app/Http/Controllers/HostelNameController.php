@@ -1,11 +1,10 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use App\HostelName;
 use Illuminate\Http\Request;
-use App\Session;
-use Illuminate\Support\Facades\DB;
-class SessionController extends Controller
+use Illuminate\support\Facades\DB;
+class HostelNameController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -14,9 +13,8 @@ class SessionController extends Controller
      */
     public function index()
     {
-        $session = DB::table('sessions')->select('id','session_year')->get();
-        return $session;
-
+       $data = DB::table('hostelnames')->get()->all();
+       return $data;
     }
 
     /**
@@ -35,17 +33,16 @@ class SessionController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $req)
     {
-        $session = new Session();
-        $session->session_year = $request->session_year;
-        $data = $session->save();
+        $hostelname = new HostelName();
+        $hostelname->hostel_name = $req->hostel_name;
+        $data = $hostelname->save();
         if($data){
-            return ['status'=> 200, 'message'=> "Data Inserted Success"];
+            return ['status'=> 200, 'message'=> 'Data Inserted Success'];
         }else{
-            return ['status' => 404, 'messaege'=> "Error Ocured"];
+            return ['status'=> 404, 'message' => 'Error Ocured'];
         }
- 
     }
 
     /**
@@ -56,8 +53,12 @@ class SessionController extends Controller
      */
     public function show($id)
     {
-        $session = Session::find($id);
-        return  $session;
+       $data = DB::table('studentnames')->where('id','=',$id)->get();
+       if($data){
+           return $data;
+       }else{
+        return ['status'=> 404, 'message'=>'error ocured'];
+       }
     }
 
     /**
@@ -78,13 +79,13 @@ class SessionController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $req, $id)
     {
-        $data = DB::table('sessions')->where('id', $id)->update(['session_year'=>$request->session_year]);
+        $data = DB::table('hostelnames')->where('id','=',$id)->update(['hostel_name'=> $req->hostel_name]);
         if($data){
-            return ['status'=> 200, 'message'=> 'Data Updated Success'];
+            return ['status'=> 200, 'message'=> 'Data Updated'];
         }else{
-            return ['status' => 404, 'message' => "Error Ocured"];
+            return ['status'=> 404, 'message' => 'Error Ocured'];
         }
     }
 
@@ -96,11 +97,12 @@ class SessionController extends Controller
      */
     public function destroy($id)
     {
-        $data = DB::table('sessions')->where('id', $id)->delete();
-        if($data){
-            return ['status'=> 200, 'message' => 'Data Deleted Success'];
+        $data = HostelName::find($id);
+        $result = $data->delete();
+        if($result){
+            return ['status'=> 200, 'message'=> 'Successfully Deleted'];
         }else{
-            return ['status' => 404, 'message' => 'Error Ocured'];
+            return ['status'=> 404, 'message' => 'Error ocured'];
         }
     }
 }
