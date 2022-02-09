@@ -14,7 +14,7 @@ class SessionController extends Controller
      */
     public function index()
     {
-        $session = DB::table('sessions')->select('id','session_year')->get();
+        $session = DB::table('sessions')->select('id','session_year')->orderBy('session_year','DESC')->get();
         return $session;
 
     }

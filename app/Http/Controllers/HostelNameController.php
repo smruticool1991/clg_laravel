@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 use App\HostelName;
 use Illuminate\Http\Request;
-use Illuminate\support\Facades\DB;
+use Illuminate\Support\Facades\DB;
 class HostelNameController extends Controller
 {
     /**
@@ -13,7 +13,7 @@ class HostelNameController extends Controller
      */
     public function index()
     {
-       $data = DB::table('hostelnames')->get()->all();
+       $data = DB::table('hostelnames')->get();
        return $data;
     }
 

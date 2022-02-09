@@ -3,7 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
-
+use App\Semester;
 class Mark extends Model
 {
     protected $table = "marks";

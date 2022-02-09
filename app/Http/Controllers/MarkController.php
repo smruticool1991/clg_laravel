@@ -32,6 +32,9 @@ class MarkController extends Controller
     public function manual(Request $req){
         
     }
+    public function existSemester($id){
+      return $id;
+    }
     /**
      * Show the form for creating a new resource.
      *

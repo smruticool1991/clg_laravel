@@ -23,8 +23,7 @@ class StudentController extends Controller
         $stream_id = $req->stream;
         $year_id = $req->year;
         $session_id = $req->session;
-
-        $data = DB::table('students')->select('mgts.id as mgts_id','mgts.student_uid','mgts.session_uid','mgts.dept_uid','mgts.optional_uid','mgts.stream_uid','students.*','hostels.*','documents.*','adrsinfos.*', 'smsinfos.sms_no')->where('session_uid','=',$session_id)->where('dept_uid','=',$year_id)->where('stream_uid','=',$stream_id)->join('mgts','students.id','=','mgts.student_uid')->join('adrsinfos','adrsinfos.student_adrs_uid','=','students.id')->join('hostels','hostels.mgts_uid','=','mgts.id')->join('documents','documents.student_doc_uid','=','students.id')->join('optionls','optionls.id','=','mgts.optional_uid')->join('smsinfos','smsinfos.student_sms_uid', 'students.id')->get();
+        $data = DB::table('mgts')->select('mgts.id as mgts_id','mgts.student_uid','mgts.session_uid','mgts.dept_uid','mgts.optional_uid','mgts.stream_uid','students.*','documents.*','adrsinfos.*', 'smsinfos.sms_no')->join('students','mgts.student_uid','students.id')->join('documents','documents.student_doc_uid','students.id')->join('adrsinfos','adrsinfos.student_adrs_uid','students.id')->join('smsinfos', 'smsinfos.student_sms_uid', 'students.id' )->where('stream_uid', $stream_id)->where('dept_uid', $year_id)->where('session_uid', $session_id)->get();
         return $data;
     }
     public function abc(Request $req){
@@ -239,7 +238,7 @@ class StudentController extends Controller
      */
     public function show($id)
     {   
-        $data = DB::table('mgts')->select('mgts.id as mgts_id','mgts.student_uid','mgts.session_uid','mgts.dept_uid','mgts.optional_uid','mgts.stream_uid','students.*','hostels.*','documents.*','adrsinfos.*', 'smsinfos.sms_no')->join('students','mgts.student_uid','students.id')->join('hostels','hostels.student_hostel_uid','students.id')->join('documents','documents.student_doc_uid','students.id')->join('adrsinfos','adrsinfos.student_adrs_uid','students.id')->join('smsinfos', 'smsinfos.student_sms_uid', 'students.id' )->where('mgts.id','=',$id)->get();
+        $data = DB::table('mgts')->select('mgts.id as mgts_id','mgts.student_uid','mgts.session_uid','mgts.dept_uid','mgts.optional_uid','mgts.stream_uid','students.*','documents.*','adrsinfos.*', 'smsinfos.sms_no','hostels.*')->join('students','mgts.student_uid','students.id')->join('documents','documents.student_doc_uid','students.id')->join('adrsinfos','adrsinfos.student_adrs_uid','students.id')->join('smsinfos', 'smsinfos.student_sms_uid', 'students.id' )->leftJoin('hostels', 'hostels.mgts_uid', 'mgts.id' )->where('mgts.id','=',$id)->get();
         if($data){
             return $data;
         }else{
@@ -279,6 +278,7 @@ class StudentController extends Controller
           $stream_id = $data->stream_uid;
           $optional_id = $data->optional_uid;
           $dept_id = $data->dept_uid; 
+
           $student = Student::find($student_id);
           $student->s_name = $req->na;
           $student->admision_date = $req->dat;
@@ -305,42 +305,79 @@ class StudentController extends Controller
           $student->pass_year = $req->pass_year;
           $student->hostel_status = $req->hostel_f;
           $student_result = $student->save();
-          
-          $hostel = Hostel::find($student_id);
-          $hostel->hostel_name = $req->h_name;
-          $hostel->floor = $req->floor_n;
-          $hostel->room = $req->room_n;
-          $hostel->res_day = $req->res_day;
-          $hostel->save();
-
-          $document = Document::find($student_id);
-           $valid_arr = $req->checkVal;
-           $docs_check = implode(",",$valid_arr);   
-           $document->document_name = $docs_check;
-           $document->save();
-
-           $adrs = Adrsinfo::find($student_id);
-            $adrs->dist_name= $req->dist;
-            $adrs->address = $req->c_address;
-            $adrs->f_name = $req->f_name;
-            $adrs->f_occu = $req->f_occu;
-            $adrs->f_annual = $req->f_income;
-            $adrs->m_name = $req->m_name;
-            $adrs->m_occu = $req->m_occu;
-            $adrs->m_annual = $req->m_income;           
-            $adrs->mob_no = $req->contact;
-            $adrs->wh_no = $req->whatsapp;
-            $adrs->lg_guard = $req->lg_guard;
-            $adrs->lg_guard_no = $req->lg_contact;
-            $adrs->save();
-            
-            $sms = Smsinfo::find($student_id);
-            if($sms){
-                $sms->sms_no = $req->sms_no;
-                $sms->save(); 
+        
+            $hostel = DB::table('hostels')->where('mgts_uid',$id)->get();
+            if($hostel->isEmpty()){
+                if($req->hostel_f == 1){
+                    $hostel1 = new Hostel();
+                    $hostel1->hostel_name_uid = $req->h_name;
+                    $hostel1->mgts_uid = $id;
+                    $hostel1->floor = $req->floor_n;
+                    $hostel1->room = $req->room_n; 
+                    $hostel1->res_day = $req->res_day;
+                    $hostel1->save();
+                }
+                              
+            }else{
+                if($req->hostel_f == 1){
+                    DB::table('hostels')->where('mgts_uid', $id)->update(['hostel_name_uid'=> $req->h_name, 'floor'=> $req->floor_n, 'room' => $req->room_n, 'res_day' => $req->res_day]);
+                }else{
+                    DB::table('hostels')->where('mgts_uid', $id)->delete(); 
+                } 
+                
             }
-           
+            $valid_arr = $req->checkVal;
+            $docs_check = implode(",",$valid_arr); 
+            $document = DB::table('documents')->where('student_doc_uid', $student_id)->update(['document_name' => $docs_check]);
 
+        //   $document = Document::find($student_id);
+        //    $valid_arr = $req->checkVal;
+        //    $docs_check = implode(",",$valid_arr);   
+        //    $document->document_name = $docs_check;
+        //    $document->save();
+
+          $adrs = DB::table('adrsinfos')->where('student_adrs_uid', $student_id)->update(
+              [
+               'dist_name' => $req->dist, 
+               'address' => $req->c_address, 
+               'f_name' => $req->f_name,
+               'f_occu' => $req->f_occu,
+                'f_annual' => $req->f_income,
+                'm_name' => $req->m_name,
+                'm_occu' => $req->m_occu,
+                'm_annual' => $req->m_income,
+                'mob_no' => $req->contact,
+                'wh_no' => $req->whatsapp,
+                'lg_guard' => $req->lg_guard,
+                'lg_guard_no' => $req->lg_contact
+              ]
+              );
+        //    $adrs = Adrsinfo::find($student_id);
+        //     $adrs->dist_name= $req->dist;
+        //     $adrs->address = $req->c_address;
+        //     $adrs->f_name = $req->f_name;
+        //     $adrs->f_occu = $req->f_occu;
+        //     $adrs->f_annual = $req->f_income;
+        //     $adrs->m_name = $req->m_name;
+        //     $adrs->m_occu = $req->m_occu;
+        //     $adrs->m_annual = $req->m_income;           
+        //     $adrs->mob_no = $req->contact;
+        //     $adrs->wh_no = $req->whatsapp;
+        //     $adrs->lg_guard = $req->lg_guard;
+        //     $adrs->lg_guard_no = $req->lg_contact;
+        //     $adrs->save();
+            $sms = DB::table('smsinfos')->where('student_sms_uid', $student_id)->get();
+            if($sms->isEmpty()){
+                DB::table('smsinfos')->where('student_sms_uid', $student_id)->get(); 
+            }else{
+                $sms = DB::table('smsinfos')->where('student_sms_uid', $student_id)->update(['sms_no' =>  $req->sms_no]);
+            }
+        //     $sms = Smsinfo::find($student_id);
+        //     if($sms){
+        //         $sms->sms_no = $req->sms_no;
+        //         $sms->save(); 
+        //     }
+         
         if($student_result){
                 return ['response' => 200,'message'=>'Data insterted success'];
             }else{

@@ -28,6 +28,7 @@ Route::apiResource('/hostelname','HostelNameController');
 Route::apiResource('/session', 'SessionController');
 Route::apiResource('/sms', 'SmsController');
 Route::apiResource('/book', 'BookDetailController');
+Route::get('/result/existsemester/{id}', 'MarkController@existSemester')->name('mark.existSemester');
 // Route::apiResource('/session', 'SessionController');
 Route::get('/com-sub', 'CommerceSubjectController@index');
 Route::get('/student/view', 'StudentController@index');

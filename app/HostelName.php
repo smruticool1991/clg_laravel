@@ -6,6 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class HostelName extends Model
 {
-   protected $table = "hostelNames";
+   protected $table = "hostelnames";
    protected $fillable = ['hostel_name'];
 }
